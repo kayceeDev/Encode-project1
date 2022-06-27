@@ -25,8 +25,8 @@ async function main() {
   }
   if (process.argv.length < 3) throw new Error("Ballot address missing");
   const ballotAddress = process.argv[2];
-  if (process.argv.length < 4) throw new Error("proposal missing");
-  const proposalToVote = process.argv[3];
+  if (process.argv.length < 4) throw new Error("To address missing");
+  const toAddress = process.argv[3];
   console.log(
     `Attaching ballot contract interface to address ${ballotAddress}`
   );
@@ -41,13 +41,19 @@ async function main() {
     throw new Error("Caller is not the chairperson for this contract");
   const chairPersonVoteStatus = await ballotContract.voters(chairpersonAddress);
   if (chairPersonVoteStatus.voted) {
-    console.log("This user already voted");
+    console.log("This user already voted and can't delegate vote");
     return;
   }
-  const tx = await ballotContract.vote(proposalToVote);
-  console.log(`Vote completed! for ${chairpersonAddress}`);
+  const toPersonVoteStatus = await ballotContract.voters(toAddress)
+  if (toPersonVoteStatus.weight.toNumber() < 1){
+    console.log("This user not eligible to vote");
+    return;
+  }
+  await ballotContract.giveRightToVote(toAddress);
+  const tx = await ballotContract.delegate(toAddress);
+  console.log(`Vote delegated from ${chairpersonAddress} to ${toAddress}`);
   console.log("Awaiting confirmations");
-  await tx.wait();
+  await tx.wait(1);
   console.log(`Transaction completed. Hash: ${tx.hash}`);
 }
 
@@ -56,8 +62,4 @@ main().catch((error) => {
   process.exitCode = 1;
 });
 
-// Contract 0x210f9cC29760EFB3f506bcbfF0651e03e281768D
-// Account 2 deployed contract 0xE54e5e482cA5dA6d4E73Aa3Ea46FaB041AF17c1C
-// Account 1 0x5F7E13a6bD7A6394D96aaE6e45356aE729Ef644a :has vote right
-// Account 3 0x59Bc318e11A769E61Da3886F00C04eE095c9906e :has vote right
-// Account 4 0xE2B18559dF90Ee5c7A3Ac6Fe001986AFd0D26EaC  : has vote right
+// 0xAd7f25326B17A17a736eB8DBF6bAF907A2114Bce
