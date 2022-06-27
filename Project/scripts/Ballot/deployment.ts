@@ -5,7 +5,7 @@ import * as ballotJson from "../../artifacts/contracts/Ballot.sol/Ballot.json";
 // This key is already public on Herong's Tutorial Examples - v1.03, by Dr. Herong Yang
 // Do never expose your keys like this
 const EXPOSED_KEY =
-  "8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f";
+  "0x689af8efa8c651a91ad287602527f3af2fe9f6501a7ac4b061667b5a93e037fd";
 
 function convertStringArrayToBytes32(array: string[]) {
   const bytes32Array = [];
@@ -21,7 +21,7 @@ async function main() {
       ? ethers.Wallet.fromMnemonic(process.env.MNEMONIC)
       : new ethers.Wallet(process.env.PRIVATE_KEY ?? EXPOSED_KEY);
   console.log(`Using address ${wallet.address}`);
-  const provider = ethers.providers.getDefaultProvider("ropsten");
+  const provider = ethers.providers.getDefaultProvider("goerli");
   const signer = wallet.connect(provider);
   const balanceBN = await signer.getBalance();
   const balance = Number(ethers.utils.formatEther(balanceBN));
@@ -54,3 +54,5 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+// 0xAdf877E35E27eE3D56094A780B207fB4a82C62CA

@@ -7,7 +7,7 @@ import { Ballot } from "../../typechain";
 // This key is already public on Herong's Tutorial Examples - v1.03, by Dr. Herong Yang
 // Do never expose your keys like this
 const EXPOSED_KEY =
-  "8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f";
+  "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
 
 async function main() {
   const wallet =
@@ -25,11 +25,12 @@ async function main() {
   }
   if (process.argv.length < 3) throw new Error("Ballot address missing");
   const ballotAddress = process.argv[2];
-  if (process.argv.length < 4) throw new Error("Voter address missing");
-  const voterAddress = process.argv[3];
+  if (process.argv.length < 4) throw new Error("proposal missing");
+  const proposalToVote = process.argv[3];
   console.log(
     `Attaching ballot contract interface to address ${ballotAddress}`
   );
+
   const ballotContract: Ballot = new Contract(
     ballotAddress,
     ballotJson.abi,
@@ -38,8 +39,8 @@ async function main() {
   const chairpersonAddress = await ballotContract.chairperson();
   if (chairpersonAddress !== signer.address)
     throw new Error("Caller is not the chairperson for this contract");
-  console.log(`Giving right to vote to ${voterAddress}`);
-  const tx = await ballotContract.giveRightToVote(voterAddress);
+  const tx = await ballotContract.vote(1);
+  console.log(`Vote completed! for ${chairpersonAddress}`);
   console.log("Awaiting confirmations");
   await tx.wait();
   console.log(`Transaction completed. Hash: ${tx.hash}`);
@@ -49,3 +50,9 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+// Contract 0x210f9cC29760EFB3f506bcbfF0651e03e281768D
+// Account 2 deployed contract 0xE54e5e482cA5dA6d4E73Aa3Ea46FaB041AF17c1C
+// Account 1 0x5F7E13a6bD7A6394D96aaE6e45356aE729Ef644a :has vote right
+// Account 3 0x59Bc318e11A769E61Da3886F00C04eE095c9906e :has vote right
+// Account 4 0xE2B18559dF90Ee5c7A3Ac6Fe001986AFd0D26EaC  : has vote right
