@@ -56,7 +56,7 @@ main().catch((error) => {
   process.exitCode = 1;
 });
 
-// Contract 0x210f9cC29760EFB3f506bcbfF0651e03e281768D
+// Contract 0x87D9DBeD8af47F33D7B47b5c27d21D6E2883FA30
 // Account 2 deployed contract 0xE54e5e482cA5dA6d4E73Aa3Ea46FaB041AF17c1C
 // Account 1 0x5F7E13a6bD7A6394D96aaE6e45356aE729Ef644a :has vote right
 // Account 3 0x59Bc318e11A769E61Da3886F00C04eE095c9906e :has vote right
