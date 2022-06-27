@@ -160,8 +160,8 @@ describe("Ballot", function () {
 
   describe("when the an attacker interact with the vote function in the contract", function () {
     // TODO
-    it("A attacker doesn't have the chairperson right and can't vote", async function () {
-      
+    it("A attacker doesn't have the chairperson right can't vote", async function () {
+      await expect(ballotContract.connect(accounts[1]).vote(0)).to.be.revertedWith("Has no right to vote")
     });
   });
 
