@@ -22,6 +22,11 @@ async function vote(ballotContract: Ballot, proposal: number) {
   const tx = await ballotContract.vote(proposal);
   await tx.wait();
 }
+
+async function delegate(ballotContract: Ballot, to: any) {
+  const tx = await ballotContract.delegate(to);
+  await tx.wait();
+}
 describe("Ballot", function () {
   let ballotContract: Ballot;
   let accounts: any[];
@@ -94,13 +99,13 @@ describe("Ballot", function () {
     // TODO
     it("Voter with voting right can vote", async function () {
       const chairpersonVoter = accounts[0].address;
-      await vote(ballotContract, 0)
+      await vote(ballotContract, 0);
       const voter = await ballotContract.voters(chairpersonVoter);
       expect(voter.voted).eq(true);
     });
 
     it("Voter without voting rights can't vote", async function () {
-      const proposal : number = 0
+      const proposal: number = 0;
       await vote(ballotContract, proposal);
       const voter = await ballotContract.voters(accounts[0].address);
       expect(voter.vote.toNumber()).eq(proposal);
@@ -108,16 +113,41 @@ describe("Ballot", function () {
 
     it("Already voted can't vote", async function () {
       await vote(ballotContract, 0);
-      await expect(vote(ballotContract, 0)).to.be.revertedWith(
-        "Already voted"
-      );
+      await expect(vote(ballotContract, 0)).to.be.revertedWith("Already voted");
     });
   });
 
   describe("when the voter interact with the delegate function in the contract", function () {
     // TODO
-    it("is not implemented", async function () {
-      throw new Error("Not implemented");
+    it("An eligible voter can delegate", async function () {
+      const fromAddress = accounts[0].address;
+      await ballotContract.giveRightToVote(accounts[1].address);
+      await delegate(ballotContract, accounts[1].address);
+      const sender = await ballotContract.voters(fromAddress);
+      expect(sender.voted).eq(true);
+    });
+
+    it("A voter can't self delegate", async function () {
+      const fromAddress = accounts[0].address;
+      await expect(delegate(ballotContract, fromAddress)).to.be.revertedWith(
+        "Self-delegation is disallowed."
+      );
+    });
+
+    it("A voter who already voted can't delegate", async function () {
+      const toAddress = accounts[1].address;
+      const propsalToVote = 1;
+      await ballotContract.vote(propsalToVote);
+      await expect(delegate(ballotContract, toAddress)).to.be.revertedWith(
+        "You already voted."
+      );
+    });
+
+    it("Voters cannot delegate to wallets that cannot vote", async function () {
+      const toAddress = accounts[1].address;
+      await expect(delegate(ballotContract, toAddress)).to.be.revertedWith(
+        ""
+      );
     });
   });
 
