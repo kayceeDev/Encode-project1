@@ -18,6 +18,10 @@ async function giveRightToVote(ballotContract: Ballot, voterAddress: any) {
   await tx.wait();
 }
 
+async function vote(ballotContract: Ballot, proposal: number) {
+  const tx = await ballotContract.vote(proposal);
+  await tx.wait();
+}
 describe("Ballot", function () {
   let ballotContract: Ballot;
   let accounts: any[];
@@ -88,8 +92,25 @@ describe("Ballot", function () {
 
   describe("when the voter interact with the vote function in the contract", function () {
     // TODO
-    it("is not implemented", async function () {
-      throw new Error("Not implemented");
+    it("Voter with voting right can vote", async function () {
+      const chairpersonVoter = accounts[0].address;
+      await vote(ballotContract, 0)
+      const voter = await ballotContract.voters(chairpersonVoter);
+      expect(voter.voted).eq(true);
+    });
+
+    it("Voter without voting rights can't vote", async function () {
+      const proposal : number = 0
+      await vote(ballotContract, proposal);
+      const voter = await ballotContract.voters(accounts[0].address);
+      expect(voter.vote.toNumber()).eq(proposal);
+    });
+
+    it("Already voted can't vote", async function () {
+      await vote(ballotContract, 0);
+      await expect(vote(ballotContract, 0)).to.be.revertedWith(
+        "Already voted"
+      );
     });
   });
 
@@ -156,3 +177,6 @@ describe("Ballot", function () {
     });
   });
 });
+// function beforeEach(arg0: () => Promise<void>) {
+//   throw new Error("Function not implemented.");
+// }
