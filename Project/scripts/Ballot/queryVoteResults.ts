@@ -35,18 +35,6 @@ async function main() {
   }
   if (process.argv.length < 3) throw new Error("Ballot address missing");
   const ballotAddress = process.argv[2];
-  if (process.argv.length < 4) throw new Error("proposal missing");
-  const numberOfVotesToQuery: number = Number(process.argv[3]);
-
-  console.log(numberOfVotesToQuery);
-  if (typeof numberOfVotesToQuery != "number") {
-    console.log("please enter a type number from 0-3");
-    return;
-  }
-  if (numberOfVotesToQuery > 3) {
-    console.log("please enter a number from 0-3");
-    return;
-  }
   console.log(
     `Attaching ballot contract interface to address ${ballotAddress}`
   );
@@ -57,7 +45,8 @@ async function main() {
     signer
   ) as Ballot;
   let totalVotes = [];
-  for (let i = 0; i < numberOfVotesToQuery; i++) {
+  const proposalLength = await ballotContract.getProposalCount()
+  for (let i = 0; i < proposalLength.toNumber(); i++) {
     const vote = await ballotContract.proposals(i);
     totalVotes.push(convertBytes32ToString(vote));
   }
