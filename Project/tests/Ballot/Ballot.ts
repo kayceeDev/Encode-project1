@@ -153,15 +153,15 @@ describe("Ballot", function () {
 
   describe("when the an attacker interact with the giveRightToVote function in the contract", function () {
     // TODO
-    it("is not implemented", async function () {
-      throw new Error("Not implemented");
+    it("A attacker doesn't have the chairperson right", async function () {
+      await expect(ballotContract.connect(accounts[1]).giveRightToVote(accounts[2].address)).to.be.revertedWith("Only chairperson can give right to vote.")
     });
   });
 
   describe("when the an attacker interact with the vote function in the contract", function () {
     // TODO
-    it("is not implemented", async function () {
-      throw new Error("Not implemented");
+    it("A attacker doesn't have the chairperson right and can't vote", async function () {
+      
     });
   });
 
